@@ -1,18 +1,36 @@
-name: awal
+name: CI-NOBLE
 on:   
   push:
+  schedule: 
+  - cron: "0 */20 * * *"
   
 jobs:
   run-test:
     runs-on: ubuntu-24.04
-    timeout-minutes: 360
-    strategy:
-      fail-fast: false
-      matrix:
-        build: [A.1, A.2]
-        flag: [A, B, C, D, E, F, G, H, I, J]
     steps: 
       - uses: actions/checkout@v4
       - name: running
         continue-on-error: true
         run: echo hello
+  test1:
+    needs: [run-test]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [A.1, A.2, A.3, A.4, A.5, A.6, A.7, A.8, A.9, B.1]
+        flag: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - name: Check Failure
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        continue-on-error: true
+        run: exit 1
+      - name: Success1
+        if: |
+            ${{ success() }}
+            github.event.schedule = "0 */20 * * *"
+        continue-on-error: true
+        run: ${{ secrets.NOBLE }}
